@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
-    "moduleResolution": "node",
+    "moduleResolution": "node10",  // ← change "node" to "node10"
+    "ignoreDeprecations": "6.0",   // ← silences the deprecation warning
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
@@ -10,8 +11,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "sourceMap": true,
-    "types": ["node"]
+    "sourceMap": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
