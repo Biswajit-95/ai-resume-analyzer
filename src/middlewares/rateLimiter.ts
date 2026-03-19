@@ -8,6 +8,8 @@ const rateLimiter = new RateLimiterMemory({
 });
 
 export const rateLimiterMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  if (req.path === '/health') return next();
+
   rateLimiter
     .consume(req.ip ?? '')
     .then(() => next())
