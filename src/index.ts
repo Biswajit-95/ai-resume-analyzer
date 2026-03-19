@@ -22,10 +22,12 @@ import { app }    from "./app";
 import { env }    from "./config";
 import { logger } from "./utils/logger";
 import mongoose   from "mongoose";
+import { Request, Response } from "express";
 
 const port = env.PORT;
 
-app.get("/", (_req, res) => {
+// index.ts
+app.get("/", (_req: Request, res: Response) => {
   res.send("AI resume analyser backend running 🚀");
 });
 

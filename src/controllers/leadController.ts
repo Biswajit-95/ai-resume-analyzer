@@ -9,7 +9,13 @@ import { ILead }         from "../models/Lead";
 import { ILeadAnalysis } from "../models/LeadAnalysis";
 import { IAnalysis }     from "../models/Analysis";
 
+// type PopulatedLead = Omit<ILead, "leadAnalysisId"> & {
+//   leadAnalysisId: Omit<ILeadAnalysis, "analysisId"> & {
+//     analysisId: IAnalysis;
+//   } | null;
+// };
 type PopulatedLead = Omit<ILead, "leadAnalysisId"> & {
+  _id: mongoose.Types.ObjectId; 
   leadAnalysisId: Omit<ILeadAnalysis, "analysisId"> & {
     analysisId: IAnalysis;
   } | null;

@@ -26,15 +26,15 @@
 
 // export default router;
 
-import { Router }   from "express";
+import { Request, Response, Router }   from "express";
 import mongoose     from "mongoose";
 import leadRoutes   from "./lead";
 import analyzeRoutes from "./analyze";
 
 const router = Router();
 
-router.get("/health", async (_req, res) => {
-  const checks: Record<string, string> = {
+// routes/index.ts
+router.get("/health", async (_req: Request, res: Response) => {  const checks: Record<string, string> = {
     server:  "ok",
     mongodb: "ok",
   };
