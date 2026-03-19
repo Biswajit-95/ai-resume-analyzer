@@ -45,9 +45,15 @@ export const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: env.NODE_ENV === 'production' ? env.BASE_URL : true, // ← was wide open
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'x-api-key'],
+    origin: env.NODE_ENV === "production"
+      ? [
+          "https://resume-analyzer-frontend-three-xi.vercel.app", // ← only frontend
+          "http://localhost:3000",   // ← local dev testing
+          "http://localhost:5173",   // ← vite port
+        ]
+      : true,
+    methods:        ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "x-api-key"],
   })
 );
 app.use(express.json({ limit: '10mb' }));
