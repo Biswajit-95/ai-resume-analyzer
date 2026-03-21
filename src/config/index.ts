@@ -9,7 +9,7 @@ const envSchema = z.object({
 
   // GEMINI_API_KEY: z.string().min(1),
   // GEMINI_API_URL: z.string().url(),
-  GROQ_API_KEY:   z.string().min(1),
+  GROQ_API_KEY: z.string().min(1),
 
   R2_ACCOUNT_ID:        z.string().min(1),
   R2_API_TOKEN:         z.string().min(1),
@@ -48,7 +48,7 @@ export const env = parsed.data;
 // ─────────────────────────────────────────
 export const config = {
   groq: {
-    apiKey:       env.GROQ_API_KEY,        // ← validated, not process.env
+    apiKey:       env.GROQ_API_KEY,
     model:        "llama-3.3-70b-versatile",
     modelVersion: "llama-3.3-70b-versatile@v1",
     maxChars:     12000,
@@ -61,6 +61,11 @@ export const config = {
       "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ] as const,
+  },
+  scoreCaps: {
+    atsScore:        58,  // max ATS score shown to user
+    hirabilityIndex: 55,  // max hirability score shown to user
+    interviewChance: 48,  // max interview chance shown to user
   },
 } as const;
 

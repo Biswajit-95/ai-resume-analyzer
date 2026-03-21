@@ -33,26 +33,35 @@ import analyzeRoutes from "./analyze";
 
 const router = Router();
 
-// routes/index.ts
-router.get("/health", async (_req: Request, res: Response) => {  const checks: Record<string, string> = {
-    server:  "ok",
-    mongodb: "ok",
-  };
+// // routes/index.ts
+// router.get("/health", async (_req: Request, res: Response) => {  const checks: Record<string, string> = {
+//     server:  "ok",
+//     mongodb: "ok",
+//   };
 
+//   try {
+//     await mongoose.connection.db.admin().ping();
+//   } catch {
+//     checks.mongodb = "unreachable";
+//   }
+
+//   const isHealthy = Object.values(checks).every((v) => v === "ok");
+
+//   return res.status(isHealthy ? 200 : 503).json({
+//     status:    isHealthy ? "healthy" : "degraded",
+//     checks,
+//     uptime:    process.uptime(),
+//     timestamp: new Date().toISOString(),
+//   });
+// });
+
+router.get("/health", async (_req: Request, res: Response) => {
   try {
     await mongoose.connection.db.admin().ping();
+    return res.status(200).json({ status: "ok" });
   } catch {
-    checks.mongodb = "unreachable";
+    return res.status(503).json({ status: "degraded" });
   }
-
-  const isHealthy = Object.values(checks).every((v) => v === "ok");
-
-  return res.status(isHealthy ? 200 : 503).json({
-    status:    isHealthy ? "healthy" : "degraded",
-    checks,
-    uptime:    process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
 });
 
 router.use("/analyze-resume", analyzeRoutes);

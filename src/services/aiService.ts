@@ -73,7 +73,6 @@
 //   return validated;
 // };
 
-
 import { ChatGroq } from "@langchain/groq";
 import { z } from "zod";
 import { config } from "../config";
@@ -81,6 +80,7 @@ import { AppError, ErrorCode } from "../errors/AppError";
 
 export const CURRENT_MODEL_VERSION = config.groq.modelVersion;
 
+// Schema
 const ResumeAnalysisSchema = z.object({
   atsScore:               z.number().int().min(0).max(100),
   hirabilityIndex:        z.number().int().min(0).max(100),
@@ -93,12 +93,14 @@ const ResumeAnalysisSchema = z.object({
 
 export type ResumeAnalysisResponse = z.infer<typeof ResumeAnalysisSchema>;
 
+// Model
 const model = new ChatGroq({
   model:       config.groq.model,
   apiKey:      config.groq.apiKey,
   temperature: 0,
 });
 
+// Prompts
 const SYSTEM_PROMPT = `
 You are an expert ATS resume analyst.
 Evaluate the resume honestly and specifically.
@@ -122,7 +124,16 @@ ${resumeText}
 </resume>
 `.trim();
 
-// Isolated: invoke → clean → parse → validate
+// Score caps — business rule
+// Creates urgency so users consider paid rewrite
+const applyScoreCaps = (result: ResumeAnalysisResponse): ResumeAnalysisResponse => ({
+  ...result,
+  atsScore:        Math.min(result.atsScore,        config.scoreCaps.atsScore),
+  hirabilityIndex: Math.min(result.hirabilityIndex, config.scoreCaps.hirabilityIndex),
+  interviewChance: Math.min(result.interviewChance, config.scoreCaps.interviewChance),
+});
+
+// Core invocation
 const invokeModel = async (resumeText: string): Promise<ResumeAnalysisResponse> => {
   const response = await model.invoke([
     { role: "system", content: SYSTEM_PROMPT },
@@ -142,6 +153,7 @@ const invokeModel = async (resumeText: string): Promise<ResumeAnalysisResponse> 
   return ResumeAnalysisSchema.parse(parsed);
 };
 
+// Public — retry + caps
 export const analyzeResumeText = async (
   resumeText: string
 ): Promise<ResumeAnalysisResponse> => {
@@ -150,7 +162,8 @@ export const analyzeResumeText = async (
 
   for (let attempt = 1; attempt <= config.groq.maxRetries; attempt++) {
     try {
-      return await invokeModel(truncated);
+      const result = await invokeModel(truncated);
+      return applyScoreCaps(result);  // ← caps applied after successful parse
     } catch (error) {
       lastError = error;
       console.warn(`AI attempt ${attempt}/${config.groq.maxRetries} failed:`, error);
